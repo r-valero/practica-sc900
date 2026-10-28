@@ -1,0 +1,2379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Microsoft Security Full Interactive Exam</title>
+  <style>
+    :root{
+      --bg:#0b1220;--bg2:#0e1627;--panel:#111a2b;--panel2:#17233a;--text:#e8eefc;--muted:#9db0d1;
+      --accent:#4f8cff;--accent2:#8b5cf6;--ok:#22c55e;--bad:#ef4444;--warn:#f59e0b;--border:#263753
+    }
+    :root.light-mode{
+      --bg:#f5f5f5;--bg2:#eef2f7;--panel:#ffffff;--panel2:#f0f0f0;--text:#1a1a1a;--muted:#666666;
+      --accent:#0066ff;--accent2:#6b3dff;--ok:#16a34a;--bad:#dc2626;--warn:#d97706;--border:#d0d0d0
+    }
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);color:var(--text);transition:background-color .3s ease}
+    .wrap{max-width:1400px;margin:0 auto;padding:24px}
+    h1{margin:0 0 4px;font-size:clamp(20px,4vw,28px);word-wrap:break-word}
+    .sub{color:var(--muted);line-height:1.4;margin-bottom:12px;font-size:clamp(12px,1.5vw,14px);max-width:70%;overflow-wrap:break-word}
+    .controlbar{position:sticky;top:0;z-index:30;padding:9px 12px;background:rgba(11,18,32,.94);backdrop-filter:blur(10px);margin:-24px -24px 14px;border-bottom:1px solid var(--border);transition:all .15s ease}
+    .light-mode .controlbar{background:rgba(245,245,245,.92)}
+    .header{padding:8px 0 12px}
+    .sub{max-width:70%}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:flex-end}
+    .compact-toolbar{display:flex;align-items:center;gap:12px;min-height:42px}
+    .compact-session-status{display:flex;align-items:center;gap:12px;min-width:0;flex:1}
+    .mode-badge{flex:0 0 auto;padding:6px 9px;border:1px solid var(--border);border-radius:999px;background:var(--panel2);font-size:12px;font-weight:800}
+    .answered-status{flex:0 0 auto;color:var(--muted);font-size:13px;font-weight:700;white-space:nowrap}
+    .compact-progress{flex:1;min-width:80px;max-width:320px}
+    .compact-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+    .score-status{display:flex;align-items:baseline;gap:6px;padding:5px 9px;border-radius:999px;background:rgba(79,140,255,.12);color:var(--muted);font-size:12px;white-space:nowrap}
+    .score-status strong{color:var(--text);font-size:15px}
+    .controls-toggle{width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1}
+    .controls-toggle .chevron{display:block;transition:transform .2s ease}
+    .controls-toggle[aria-expanded="true"] .chevron{transform:rotate(180deg)}
+    .controls-drawer{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:12px 0 3px;margin-top:8px;border-top:1px solid var(--border)}
+    .controls-drawer[hidden]{display:none!important}
+    .control-group{display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px}
+    .control-group-label{flex-basis:100%;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+    button{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:700;transition:all .2s ease}
+    button:hover{background:var(--panel);transform:translateY(-1px)}
+    button:focus-visible,input:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 65%,transparent);outline-offset:3px}
+    button.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none}
+    button.secondary{background:transparent}
+    button.choice.active{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff}
+    button.theme-toggle{width:40px;height:40px;padding:6px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    button.mode-toggle{border-radius:10px;padding:8px 10px;background:var(--panel2);font-weight:700}
+    input[type=text],input[type=number],select{width:100%;border:1px solid var(--border);background:#0a1120;color:var(--text);border-radius:12px;padding:12px 14px}
+    .light-mode input[type=text],.light-mode input[type=number],.light-mode select{background:#ffffff;color:var(--text)}
+    .progress{width:100%;height:6px;background:#0a1120;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+    .progress>div{height:100%;width:0;background:linear-gradient(135deg,var(--accent),var(--accent2));transition:width .3s ease}
+    .notice{margin:0 0 14px;background:rgba(17,26,43,.98);border:1px solid var(--border);padding:10px 14px;border-radius:12px;color:var(--muted);line-height:1.45}
+    .session-setup{max-width:1080px;background:rgba(17,26,43,.98);border:1px solid var(--border);border-radius:22px;padding:clamp(20px,4vw,32px);margin:24px auto;box-shadow:0 24px 70px rgba(0,0,0,.18)}
+    .session-setup h2{margin:0 0 6px;font-size:22px}
+    .session-setup>p{margin:0 0 18px;color:var(--muted);line-height:1.45}
+    .setup-grid{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(320px,1.4fr);gap:22px}
+    .setup-group{min-width:0}
+    .setup-label{display:block;margin-bottom:10px;font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    .choice-row{display:flex;flex-wrap:wrap;gap:9px}
+    .mode-choice{min-width:180px;align-items:flex-start;text-align:left;display:flex;flex-direction:column;gap:3px;padding:14px 16px}
+    .choice-title{font-size:15px;font-weight:800}
+    .choice-detail{font-size:12px;font-weight:500;line-height:1.35;color:var(--muted)}
+    .mode-choice.active .choice-detail{color:rgba(255,255,255,.82)}
+    .count-choice{min-width:92px;display:flex;flex-direction:column;gap:2px}
+    .count-choice small{color:var(--muted);font-weight:500}
+    .count-choice.active small{color:rgba(255,255,255,.82)}
+    .custom-count{display:grid;grid-template-columns:minmax(120px,180px) 1fr;gap:12px;align-items:center;margin-top:12px}
+    .custom-count span{font-size:13px;color:var(--muted)}
+    .setup-options{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-top:18px}
+    .check-option{display:flex;gap:9px;align-items:center;color:var(--text);font-weight:700}
+    .check-option input{width:18px;height:18px}
+    .setup-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+    .setup-preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;padding:12px 14px;border:1px solid var(--border);border-radius:14px;background:rgba(79,140,255,.07);color:var(--muted);font-size:13px}
+    .setup-preview span:not(:last-child)::after{content:'·';margin-left:8px;color:var(--border)}
+    .session-summary{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;color:var(--muted);font-size:13px}
+    .session-summary strong{color:var(--text)}
+    #sessionContent{max-width:980px;margin:0 auto}
+    .quiz{display:grid;gap:14px}
+    .question{background:rgba(17,26,43,.98);border:1px solid var(--border);border-radius:18px;padding:16px;transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease}
+    .question.is-correct{border-color:rgba(34,197,94,.48);box-shadow:inset 4px 0 0 rgba(34,197,94,.75)}
+    .question.is-incorrect{border-color:rgba(239,68,68,.45);box-shadow:inset 4px 0 0 rgba(239,68,68,.72)}
+    .question.is-unanswered{border-color:rgba(245,158,11,.45);box-shadow:inset 4px 0 0 rgba(245,158,11,.72)}
+    .question h3{margin:0 0 8px;font-size:17px;line-height:1.45}
+    .kind{color:var(--muted);font-size:12px;margin-bottom:12px}
+    .options{display:grid;gap:10px}
+    .option{display:flex;gap:10px;align-items:flex-start;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:11px 12px;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+    .option:hover{background:rgba(79,140,255,.07);border-color:color-mix(in srgb,var(--accent) 45%,var(--border))}
+    .option:has(input:checked){background:rgba(79,140,255,.12);border-color:var(--accent)}
+    .option.is-correct-answer{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.62)}
+    .option.is-wrong-answer{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.58)}
+    .option input{margin-top:3px}
+    .feedback{margin-top:12px;padding:10px 12px;border-radius:12px;display:none;line-height:1.45}
+    .feedback.ok{display:block;background:rgba(34,197,94,.12);color:#c9f7d8;border:1px solid rgba(34,197,94,.25)}
+    .feedback.bad{display:block;background:rgba(239,68,68,.10);color:#ffd0d0;border:1px solid rgba(239,68,68,.25)}
+    .feedback.warn{display:block;background:rgba(245,158,11,.10);color:#ffe7ba;border:1px solid rgba(245,158,11,.25)}
+    .result-panel{max-width:980px;margin:0 auto 18px;padding:20px;border:1px solid color-mix(in srgb,var(--accent) 46%,var(--border));border-radius:18px;background:linear-gradient(135deg,rgba(79,140,255,.13),rgba(139,92,246,.09));box-shadow:0 18px 50px rgba(0,0,0,.13)}
+    .result-layout{display:flex;align-items:center;gap:18px;justify-content:space-between}
+    .result-score{display:flex;align-items:baseline;gap:10px}
+    .result-score strong{font-size:clamp(30px,6vw,44px);line-height:1}
+    .result-score span{color:var(--muted);font-weight:700}
+    .result-breakdown{margin-top:7px;color:var(--muted);line-height:1.5}
+    .result-actions{display:flex;flex-wrap:wrap;gap:9px;justify-content:flex-end}
+    .small{color:var(--muted);font-size:12px}
+    .hidden{display:none!important}
+    /* Light mode overrides for better readability */
+    .light-mode .controlbar{background:#ffffff}
+    .light-mode .question{background:#ffffff;border:1px solid #e6edf7;color:var(--text)}
+    .light-mode .option{background:#fbfdff;border:1px solid #e6edf7;color:var(--text)}
+    .light-mode .question.is-correct{border-color:#87d6a2}
+    .light-mode .question.is-incorrect{border-color:#efaaaa}
+    .light-mode .question.is-unanswered{border-color:#e8c27f}
+    .light-mode .option:has(input:checked){background:#edf4ff;border-color:var(--accent)}
+    .light-mode .option.is-correct-answer{background:#eaf8ef;border-color:#87d6a2}
+    .light-mode .option.is-wrong-answer{background:#fef0f0;border-color:#efaaaa}
+    .light-mode .option span{color:var(--text)}
+    .light-mode input[type="text"]{background:#ffffff;color:var(--text);border:1px solid #d6e0ec}
+    .light-mode input::placeholder{color:#8a8f98}
+    .light-mode .notice{background:#f6f9ff;border:1px solid #e6edf7;color:var(--text)}
+    .light-mode .session-setup{background:#ffffff;border-color:#e6edf7;color:var(--text)}
+    .light-mode .result-panel{background:linear-gradient(135deg,#f2f7ff,#f7f3ff);box-shadow:0 18px 45px rgba(58,76,108,.12)}
+    .light-mode .feedback.ok{color:#11652e;background:#eaf8ef;border-color:#a9dfba}
+    .light-mode .feedback.bad{color:#991b1b;background:#fef0f0;border-color:#f5b9b9}
+    .light-mode .feedback.warn{color:#8a4b08;background:#fff7e8;border-color:#f1d19c}
+    .light-mode .progress{background:#f0f4fb;border:1px solid #e6edf7}
+    .light-mode button:hover{background:#f0f4fb}
+    .light-mode button.choice.active:hover{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .light-mode .sub{color:var(--muted)}
+    @media (max-width:900px){
+      .controls{justify-content:flex-start}
+      .controls-drawer{grid-template-columns:1fr}
+      .setup-grid{grid-template-columns:1fr}
+      .sub{max-width:100%}
+      .result-layout{align-items:flex-start;flex-direction:column}
+      .result-actions{justify-content:flex-start}
+    }
+    @media (max-width:520px){
+      .wrap{padding:16px}
+      .controlbar{margin:-16px -16px 16px}
+      .compact-toolbar{gap:8px}
+      .mode-badge{display:none}
+      .answered-status{font-size:12px}
+      .compact-progress{min-width:44px}
+      .score-status{position:absolute;top:100%;right:12px;margin-top:6px;border:1px solid var(--border);background:var(--panel)}
+      #submitBtn{padding:10px 12px}
+      .custom-count{grid-template-columns:1fr}
+      .choice-row button{flex:1 1 calc(33.333% - 9px)}
+      .mode-choice{min-width:100%}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="controlbar">
+    <div class="compact-toolbar">
+      <button class="theme-toggle" id="themeToggleBtn" title="Toggle dark/light mode">🌙</button>
+
+      <div class="compact-session-status session-control hidden" id="compactSessionStatus">
+        <span class="mode-badge" id="compactModeLabel">Exam</span>
+        <span class="answered-status" id="answeredValue">0/0 answered</span>
+        <div class="compact-progress progress" aria-label="Answer progress"><div id="progressBar"></div></div>
+        <span class="score-status hidden" id="scoreStatus">Score <strong id="scoreValue">—</strong></span>
+      </div>
+
+      <div class="compact-actions">
+      <button class="primary session-control hidden" id="submitBtn">Submit answers</button>
+        <button class="controls-toggle session-control hidden" id="controlsToggleBtn" type="button" aria-expanded="false" aria-controls="controlsDrawer" title="Show more controls"><span class="chevron">⌄</span></button>
+      </div>
+    </div>
+
+    <div class="controls-drawer" id="controlsDrawer" hidden>
+      <div class="control-group">
+        <span class="control-group-label">Session</span>
+        <button class="session-control hidden" id="newSessionBtn">New session</button>
+        <button class="session-control hidden" id="shuffleOrderBtn">Shuffle order</button>
+        <button class="session-control hidden" id="newSelectionBtn">New selection</button>
+      </div>
+      <div class="control-group">
+        <span class="control-group-label">Review</span>
+        <button class="session-control hidden" id="resetBtn">Reset answers</button>
+        <button class="session-control hidden" id="showOnlyWrongBtn">Show incorrect / unanswered</button>
+        <button class="session-control hidden" id="showAllBtn">Show all questions</button>
+      </div>
+      <div class="control-group">
+        <span class="control-group-label">Display</span>
+        <span class="small">Use the sun/moon button to switch the page theme.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="notice" id="summaryBox">Ready.</div>
+
+  <section class="session-setup" id="sessionSetup">
+    <h2>Prepare a practice session</h2>
+    <p>Choose a mode and session size. Your preferences will be remembered on this device.</p>
+
+    <div class="setup-grid">
+      <div class="setup-group">
+        <span class="setup-label">Practice mode</span>
+        <div class="choice-row" id="modeChoices">
+          <button class="choice mode-choice active" type="button" data-mode="exam">
+            <span class="choice-title">Exam</span>
+            <span class="choice-detail">See the complete result when you submit.</span>
+          </button>
+          <button class="choice mode-choice" type="button" data-mode="study">
+            <span class="choice-title">Study</span>
+            <span class="choice-detail">Get feedback immediately after each answer.</span>
+          </button>
+        </div>
+        <div class="small" id="modeHelp">Answers are graded when you submit the session.</div>
+      </div>
+
+      <div class="setup-group">
+        <span class="setup-label">Number of questions</span>
+        <div class="choice-row" id="countChoices">
+          <button class="choice count-choice" type="button" data-count="20"><span>20</span><small>Quick</small></button>
+          <button class="choice count-choice active" type="button" data-count="40"><span>40</span><small>Standard</small></button>
+          <button class="choice count-choice" type="button" data-count="80"><span>80</span><small>Extended</small></button>
+          <button class="choice count-choice" type="button" data-count="200"><span>200</span><small>Simulation</small></button>
+          <button class="choice count-choice" id="allQuestionsChoice" type="button" data-count="all"><span>All</span><small>Full bank</small></button>
+        </div>
+        <label class="custom-count" for="customCountInput">
+          <input id="customCountInput" type="number" min="1" step="1" placeholder="Custom amount" />
+          <span>Enter any value between 1 and the size of the question bank.</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="setup-options">
+      <label class="check-option"><input id="shuffleSessionInput" type="checkbox" checked /> Randomize question order</label>
+    </div>
+
+    <div class="setup-preview" id="setupPreview" aria-live="polite">
+      <span id="previewMode">Exam mode</span>
+      <span id="previewCount">40 questions</span>
+      <span id="previewDuration">About 30–45 minutes</span>
+    </div>
+
+    <div class="setup-actions">
+      <button class="primary" id="startSessionBtn" type="button">Start session</button>
+      <button class="secondary hidden" id="cancelSetupBtn" type="button">Return to current session</button>
+    </div>
+  </section>
+
+  <section class="result-panel hidden" id="resultPanel" aria-live="polite">
+    <div class="result-layout">
+      <div>
+        <div class="result-score"><strong id="resultPercent">0%</strong><span id="resultFraction">0/0 correct</span></div>
+        <div class="result-breakdown" id="resultBreakdown"></div>
+      </div>
+      <div class="result-actions">
+        <button id="reviewIncorrectResultBtn" type="button">Review incorrect</button>
+        <button class="primary" id="newSessionResultBtn" type="button">New session</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="hidden" id="sessionContent">
+    <div class="header">
+      <h1>Microsoft Security Interactive Practice</h1>
+      <div class="session-summary"><strong id="sessionDescription"></strong></div>
+      <div class="sub">Practice with a focused selection from the complete question bank. Supports single-answer and multi-answer questions, automatic validation, search, score, and reset.</div>
+      <input id="searchInput" type="text" placeholder="Search this session..." />
+    </div>
+
+    <div class="quiz" id="quiz"></div>
+    <div class="small">Tip: single-answer questions use radio buttons. Multi-answer questions use checkboxes and require the exact marked combination from the source content.</div>
+  </main>
+</div>
+
+<script>
+const RAW_SOURCE = String.raw`### Conditional access policies always enforce the user of multi-factor authentication (MFA).
+
+- [ ] Yes.
+- [x] No.
+
+### Conditional access policies can be used to block access to an application based on the location of the user.
+
+- [x] Yes.
+- [ ] No.
+
+### Conditional access policies only affect users who have Microsoft Entra ID-joined devices.
+
+- [ ] Yes.
+- [x] No.
+
+### [...] is used to identify, hold, and export electronic information that might be used in an investigation.
+
+- [ ] Customer Lockbox.
+- [ ] Data loss prevention (DLP).
+- [x] eDiscovery.
+- [ ] Resource lock.
+
+### Microsoft Defender for Endpoint can protect Android devices.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Defender for Endpoint can protect Azure virtual machines that run Windows 10.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Defender for Endpoint can protect Microsoft SharePoint Online sites and content from viruses.
+
+- [ ] Yes.
+- [x] No.
+
+### What feature in Microsoft Defender for Endpoint provides the first line of defense against cyberthreats by reducing the attack surface?
+
+- [ ] Automated remediation.
+- [ ] Automated investigation.
+- [ ] Advanced hunting.
+- [x] Network protection.
+
+### Which score measures an organization’s progress in completing actions that help reduce risks associated to data protection and regulatory standards?
+
+- [ ] Microsoft Secure Score.
+- [ ] Productivity Score.
+- [ ] Secure score in Microsoft Defender for Cloud.
+- [x] Compliance score.
+
+### You can add a resource lock to an Azure subscription.
+
+- [x] Yes.
+- [ ] No.
+
+### You can add only one resource lock to an Azure resource.
+
+- [ ] Yes.
+- [x] No.
+
+### You can delete a resource group containing resources that have resources locks.
+
+- [ ] Yes.
+- [x] No.
+
+### Azure Defender can detect vulnerabilities and threats for Azure Storage.
+
+- [x] Yes.
+- [ ] No.
+
+### Cloud Security Posture Management (CSPM) is available for all Azure subscriptions.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Defender for Cloud can evaluate the security of workloads deployed to Azure or on-premises.
+
+- [x] Yes.
+- [ ] No.
+
+### In the shared responsibility model for an Azure deployment, what is Microsoft solely responsible for managing?
+
+- [ ] The management of mobile devices.
+- [ ] The permissions for the user data stored in Azure.
+- [ ] The creation and management of user accounts.
+- [x] The management of the physical hardware.
+
+### Which Microsoft 365 feature can you use to restrict communication and the sharing of information between members of two departments at your organization?
+
+- [ ] Sensitivity label policies.
+- [ ] Customer Lockbox.
+- [x] Information Barriers.
+- [ ] Privileged Access Management (PAM).
+
+### You can use [...] in the Microsoft 365 security center to identify devices that are affected by an alert.
+
+- [ ] classifications.
+- [x] incidents.
+- [ ] policies.
+- [ ] secure score.
+
+### When users sign in to the Azure portal, they are first [...].
+
+- [ ] assigned permissions.
+- [x] authenticated.
+- [ ] authorized.
+- [ ] resolved.
+
+### You plan to implement a security strategy and place multiple layers of defense throughout a network infrastructure. Which security methodology does this represent?
+
+- [ ] Threat modeling.
+- [ ] Identity as the security perimeter.
+- [x] Defense in depth.
+- [ ] The shared responsibility model.
+
+### Compliance Manager assesses compliance data [...] for an organization.
+
+- [x] continually.
+- [ ] monthly.
+- [ ] on-demand.
+- [ ] quarterly.
+
+### What should you use in the Microsoft 365 security center to view security trends and track the protection status of identities?
+
+- [ ] Attack simulator.
+- [x] Reports.
+- [ ] Hunting.
+- [ ] Incidents.
+
+### Digitally signing a document requires a private key.
+
+- [x] Yes.
+- [ ] No.
+
+### Verifying the authenticity of a digitally signed document requires the public key of the signer.
+
+- [x] Yes.
+- [ ] No.
+
+### Verifying the authenticity of a digitally signed document requires the private key of the signer.
+
+- [ ] Yes.
+- [x] No.
+
+### In the Microsoft Cloud Adoption Framework for Azure, which two phases are addressed before the Ready phase?
+
+- [x] Plan.
+- [ ] Manage.
+- [ ] Adopt.
+- [ ] Govern.
+- [x] Define Strategy.
+
+### What can you use to provide a user with a two-hour window to complete an administrative task in Azure?
+
+- [x] Microsoft Entra ID Privileged Identity Management (PIM).
+- [ ] Azure Multi-Factor Authentication (MFA).
+- [ ] Microsoft Entra ID Identity Protection.
+- [ ] conditional access policies.
+
+### Applying system updates increases an organization's secure score in Microsoft Defender for Cloud.
+
+- [x] Yes.
+- [ ] No.
+
+### The secure score in Microsoft Defender for Cloud can evaluate resources across multiple Azure subscriptions.
+
+- [x] Yes.
+- [ ] No.
+
+### Enabling multi-factor authentication (MFA) increases an organization's secure score in Microsoft Defender for Cloud.
+
+- [x] Yes.
+- [ ] No.
+
+### [...] enables collaboration with business partners from external organizations such as suppliers, partners, and vendors. External users appear as guest in the directory.
+
+- [ ] Active Directory Domain Services (AD DS).
+- [ ] Active Directory forest trust.
+- [x] Microsoft Entra ID business-to-business (B2B).
+- [ ] Microsoft Entra ID business-to-consumer (B2C).
+
+### Which Microsoft portal provides information about how Microsoft manages privacy, compliance, and security?
+
+- [x] Microsoft Service Trust Portal.
+- [ ] Compliance Manager.
+- [ ] Microsoft 365 Compliance Center.
+- [ ] Microsoft Support.
+
+### What can you use to scan email attachments and forward the attachments to recipients only if the attachments are free from malware?
+
+- [x] Microsoft Defender for Office 365.
+- [ ] Microsoft Defender Antivirus.
+- [ ] Microsoft Defender for Identity.
+- [ ] Microsoft Defender for Endpoint.
+
+### What is the purpose of Microsoft Entra ID Password Protection?
+
+- [ ] To control how often users must change their passwords.
+- [ ] To identify devices to which users can sign in without using multi-factor authentication (MFA).
+- [ ] To encrypt a password by using globally recognized encryption standards.
+- [x] To prevent users from using specific words in their passwords.
+
+### Network security groups (NSGs) can deny inbound traffic from the internet.
+
+- [x] Yes.
+- [ ] No.
+
+### Network security groups (NSGs) can deny outbound traffic to the internet.
+
+- [x] Yes.
+- [ ] No.
+
+### Network security groups (NSGs) can filter traffic based on IP address, protocol, and port.
+
+- [x] Yes.
+- [ ] No.
+
+### What is an example of encryption at rest?
+
+- [ ] Encrypting communications by using a site-to-site VPN.
+- [x] Encrypting a virtual machine disk.
+- [ ] Accessing a website by using an encrypted HTTPS connection.
+- [ ] Sending an encrypted email.
+
+### Azure DDoS Protection Standard can be used to protect [...].
+
+- [ ] Microsoft Entra ID applications.
+- [ ] Microsoft Entra ID users.
+- [ ] resource groups.
+- [x] virtual networks.
+
+### Which three authentication methods can be used by Azure Multi-Factor Authentication (MFA)?
+
+- [x] Text message (SMS).
+- [x] Microsoft Authenticator app.
+- [ ] Email verification.
+- [x] Phone call.
+- [ ] Security question.
+
+### Which Microsoft 365 Compliance Center feature can you use to identify all the documents on a Microsoft SharePoint Online site that contain a specific key word?
+
+- [ ] Audit.
+- [ ] Compliance Manager.
+- [x] Content Search.
+- [ ] Alerts.
+
+### You can use the insider risk management solution to detect phising scams.
+
+- [ ] Yes.
+- [x] No.
+
+### You can access the insider risk management solution from the Microsoft 365 Compliance Center.
+
+- [x] Yes.
+- [ ] No.
+
+### You can use the insider risk management solution to detect data leaks by unhappy employees.
+
+- [x] Yes.
+- [ ] No.
+
+### What are two capabilities of Microsoft Defender for Endpoint?
+
+- [x] Automated investigation and remediation.
+- [ ] Transport encryption.
+- [ ] Shadow IT detection.
+- [x] Attack surface reduction.
+
+### Microsoft Intune can be used to manage Android devices.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Intune can be used to provision Azure subscriptions.
+
+- [ ] Yes.
+- [x] No.
+
+### Microsoft Intune can be used to manage organization-owned devices and personal devices.
+
+- [x] Yes.
+- [ ] No.
+
+### Compliance Manager tracks only customer-managed controls.
+
+- [ ] Yes.
+- [x] No.
+
+### Compliance Manager provides predefined templates for creating assessments.
+
+- [x] Yes.
+- [ ] No.
+
+### Compliance Manager can help you asses whether data adheres to specific data protection standards.
+
+- [x] Yes.
+- [ ] No.
+
+### Which two tasks can you implement by using data loss prevention (DLP) policies in Microsoft 365?
+
+- [x] Display policy tips to users who are about to violate your organization’s policies.
+- [ ] Enable disk encryption on endpoints.
+- [x] Protect documents in Microsoft OneDrive that contain sensitive information.
+- [ ] Apply security baselines to devices.
+
+### [...] requires additional verification, such as a verification code sent to a mobile phone.
+
+- [x] Multi-factor authentication (MFA).
+- [ ] Pass-through authentication.
+- [ ] Password writeback.
+- [ ] Single sign-on (SSO).
+
+### With Advanced Audit in Microsoft 365, you can identify when email items were accessed.
+
+- [x] Yes.
+- [ ] No.
+
+### Advenced Audit in Microsoft 365 supports the same retention period of audit logs as core auditing.
+
+- [ ] Yes.
+- [x] No.
+
+### Advanced Audit in Microsoft 365 allocates customer-dedicated bandwidth for accessing audit data.
+
+- [x] Yes.
+- [ ] No.
+
+### [...] provides a central location for managing information protection, information governance, and data loss prevention (DLP) policies.
+
+- [ ] Azure Defender.
+- [x] Microsoft Purview compliance portal.
+- [ ] The Microsoft 365 security center.
+- [ ] Microsoft Endpoint Manager.
+
+### Which Microsoft 365 compliance feature can you use to encrypt content automatically based on specific conditions?
+
+- [ ] Content Search.
+- [x] Sensitivity labels.
+- [ ] Retention policies.
+- [ ] eDiscovery.
+
+### In Azure Sentinel, you can automate common tasks by using [...].
+
+- [ ] deep investigation tools.
+- [ ] hunting search-and-query tools.
+- [x] playbooks.
+- [ ] workbooks.
+
+### All Microsoft Entra ID license editions include the same features.
+
+- [ ] Yes.
+- [x] No.
+
+### You can manage an Microsoft Entra ID tenant by using the Azure portal.
+
+- [x] Yes.
+- [ ] No.
+
+### You must deploy Azure virtual machines to host an Microsoft Entra ID tenant.
+
+- [ ] Yes.
+- [x] No.
+
+### Microsoft Entra ID is [...] used for authentication and authorization.
+
+- [ ] an extended detection and response (XDR) system.
+- [x] an identity provider.
+- [ ] a management group.
+- [ ] a security information and event management (SIEM) system.
+
+### [...] can be used to provide Microsoft Support Engineers with access to an organization's data stored in Microsoft Exchange Online, SharePoint Online, and OneDrive for Business.
+
+- [x] Customer Lockbox.
+- [ ] Information barriers.
+- [ ] Privileged Access Management (PAM).
+- [ ] Sensitivity labels.
+
+### What do you use to provide real-time integration between Azure Sentinel and another security source?
+
+- [ ] Microsoft Entra Connect.
+- [ ] Log Analytics workspace.
+- [ ] Azure Information Protection.
+- [x] Data connector.
+
+### You can create custom roles in Microsoft Entra ID.
+
+- [x] Yes.
+- [ ] No.
+
+### Global administrator is a role in Microsoft Entra ID.
+
+- [x] Yes.
+- [ ] No.
+
+### An Microsoft Entra ID user can be assigned only one role.
+
+- [ ] Yes.
+- [x] No.
+
+### Microsoft Entra ID Identity Protection can add users to groups based on the users' risk level.
+
+- [ ] Yes.
+- [x] No.
+
+### Microsoft Entra ID Identity Protection can detect whether user credentials were leaked to the public.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Entra ID Identity Protection can be used to invoke Multi-Factor Authentication based on a user's risk level.
+
+- [x] Yes.
+- [ ] No.
+
+### Which feature provides the extended detection and response (XDR) capability of Azure Sentinel?
+
+- [ ] Integration with the Microsoft 365 Compliance Center.
+- [ ] Support for threat hunting.
+- [x] Integration with Microsoft 365 Defender.
+- [ ] Support for Azure Monitor Workbooks.
+
+### Which Microsoft Entra ID feature can you use to provide just-in-time (JIT) access to manage Azure resources?
+
+- [ ] Conditional access policies.
+- [ ] Microsoft Entra ID Protection.
+- [x] Microsoft Entra Privileged Identity Management (PIM).
+- [ ] Authentication method policies.
+
+### In software as a service (SaaS), applying service packs to applications is the responsibility of the organization.
+
+- [ ] Yes.
+- [x] No.
+
+### In infrastructure as a service (IaaS), managing the physical network is the responsibility of the cloud provider.
+
+- [x] Yes.
+- [ ] No.
+
+### In all Azure Cloud deployment types, managing the security of information and data is the responsibility of the organization.
+
+- [x] Yes.
+- [ ] No.
+
+### Applications registered in Microsoft Entra ID are associated automatically to a [...].
+
+- [ ] guest account.
+- [ ] managed identity.
+- [x] service principal.
+- [ ] user account.
+
+### [...] is a cloud-native security information and event management (SIEM) and security orchestration automated response (SOAR) solution used to provide a single solution for alert detection, threat visibility, proactive hunting, and threat response.
+
+- [ ] Azure Advisor.
+- [ ] Azure Bastion.
+- [ ] Azure Monitor.
+- [x] Azure Sentinel.
+
+### [...] a file makes the data in the file readable and usable to viewers that have the appropriate key.
+
+- [ ] Archiving.
+- [ ] Compressing.
+- [ ] Deduplicating.
+- [x] Encrypting.
+
+### Sensitivity labels can be used to encrypt documents.
+
+- [x] Yes.
+- [ ] No.
+
+### Sensitivity labels can add headers and footers to documents.
+
+- [x] Yes.
+- [ ] No.
+
+### Sensitivity labels can apply watermarks to emails.
+
+- [x] Yes.
+- [ ] No.
+
+### [...] is a cloud-based solution that leverages on-premises Active Directory signals to identify, detect, and investigate advanced threats.
+
+- [ ] Microsoft Cloud App Security.
+- [ ] Microsoft Defender for Endpoint.
+- [x] Microsoft Defender for Identity.
+- [ ] Microsoft Defender for Office 365.
+
+### Azure Policy supports automatic remediation.
+
+- [x] Yes.
+- [ ] No.
+
+### Azure Policy can be used to ensure that new resources adhere to corporate standards.
+
+- [x] Yes.
+- [ ] No.
+
+### Compliance evaluation in Azure Policy occurs only when a target resource is created or modified.
+
+- [ ] Yes.
+- [x] No.
+
+### Federation is used to establish [...] between organizations.
+
+- [ ] multi-factor authentication (MFA).
+- [x] a trust relationship.
+- [ ] user account synchronization.
+- [ ] a VPN connection.
+
+### [...] provides Network Address Translation (NAT) services.
+
+- [ ] Azure Bastion.
+- [x] Azure Firewall.
+- [ ] Network Security Group (NSG).
+
+### [...] provides secure and seamless Remote Desktop connectivity to Azure virtual machines.
+
+- [x] Azure Bastion.
+- [ ] Azure Firewall.
+- [ ] Network Security Group (NSG).
+
+### [...] provides provides traffic filtering that can be applied to specific network interfaces on a virtual network.
+
+- [ ] Azure Bastion.
+- [ ] Azure Firewall.
+- [x] Network Security Group (NSG).
+
+### Conditional access policies can use the device state as a signal.
+
+- [x] Yes.
+- [ ] No.
+
+### Conditional access policies apply before first-factor authentication is complete.
+
+- [ ] Yes.
+- [x] No.
+
+### Conditional access policies can trigger multi-factor authentication (MFA) if a user attempts to access a specific application.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Entra ID Protection can add users to groups based on the users' risk level.
+
+- [ ] Yes.
+- [x] No.
+
+### Microsoft Entra ID Protection can detect whether user credentials were leaked to the public.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Entra ID Protection can be used to invoke Multi-Factor Authentication based on the users' risk level.
+
+- [x] Yes.
+- [ ] No.
+
+### Security defaults require an Microsoft Entra ID Premium license.
+
+- [ ] Yes.
+- [x] No.
+
+### Security defaults can be enabled for a single Microsoft Entra ID user.
+
+- [ ] Yes.
+- [x] No.
+
+### When Security defaults are enabled, all administrators must use multi-factor authentication (MFA).
+
+- [x] Yes.
+- [ ] No.
+
+### Control is a key privacy principle of Microsoft.
+
+- [x] Yes.
+- [ ] No.
+
+### Transparency is a key principle of Microsoft.
+
+- [x] Yes.
+- [ ] No.
+
+### Shared responsibility a key principle of Microsoft.
+
+- [ ] Yes.
+- [x] No.
+
+### What should you use to ensure that the members of a Microsoft Entra ID group use multi-factor authentication (MFA) when they sign in?
+
+- [ ] Microsoft Entra ID Identity Protection.
+- [x] A conditional access policy.
+- [ ] Azure role-based access control (Azure RBAC).
+- [ ] Microsoft Entra ID Privileged Identity Management (PIM).
+
+### Microsoft Defender for Cloud can detect vulnerabilities and threats for Azure Storage.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Entra Conditional Access policies can enforce authentication from approved client applications.
+
+- [x] Yes.
+- [ ] No.
+
+### [...] provides benchmark recommendations and guidance for protecting Azure services.
+
+- [ ] Azure Application Insights.
+- [ ] Azure Network Watcher.
+- [ ] Log Analytics workspaces.
+- [x] Security baselines for Azure.
+
+### Which two Azure resources can a network security group (NSG) be associated with?
+
+- [x] Network interface.
+- [ ] Azure App Service web app.
+- [ ] Virtual network.
+- [x] Virtual network subnet.
+- [ ] Resource group.
+
+### Microsoft Entra Connect can be used to implement hybrid identity.
+
+- [x] Yes.
+- [ ] No.
+
+### Hybrid identity requires the implementation of two Microsoft 365 tenants.
+
+- [ ] Yes.
+- [x] No.
+
+### Hybrid identity refers to the synchronization of Active Directory Domain Services (AD DS) and Microsoft Entra ID.
+
+- [x] Yes.
+- [ ] No.
+
+### Match the types of compliance score actions to the appropriate tasks. [...] Use encryption to protect data at rest.
+
+- [ ] Corrective.
+- [ ] Detective.
+- [x] Preventative.
+
+### Match the types of compliance score actions to the appropriate tasks. [...] Actively monitor systems to identify irregularities that might represent risks.
+
+- [ ] Corrective.
+- [x] Detective.
+- [ ] Preventative.
+
+### You can use the insider risk management solution to detect phishing scams.
+
+- [ ] Yes.
+- [x] No.
+
+### To which type of resource can Azure Bastion provide secure access?
+
+- [ ] Azure Files.
+- [ ] Azure SQL Managed Instances.
+- [x] Azure virtual machines.
+- [ ] Azure App Service.
+
+### Conditional access policies always enforce the use of multi-factor authentication (MFA).
+
+- [ ] Yes.
+- [x] No.
+
+### What can you protect by using the information protection solution in the Microsoft 365 Compliance Center?
+
+- [ ] Computers from zero-day exploits.
+- [ ] Users from phishing attempts.
+- [ ] Files from malware and viruses.
+- [x] Sensitive data from being exposed to unauthorized users.
+
+### Microsoft Sentinel [...] use Azure Logic Apps to automate and orchestrate responses to alerts.
+
+- [ ] analytic rules.
+- [ ] hunting queries.
+- [x] playbooks.
+- [ ] workbooks.
+
+### What are three uses of Microsoft Cloud App Security?
+
+- [x] Discover and control the use of shadow IT.
+- [ ] Provide secure connections to Azure virtual machines.
+- [x] Protect sensitive information hosted anywhere in the cloud.
+- [ ] Provide pass-through authentication to on-premises applications.
+- [x] Prevent data leaks to noncompliant apps and limit access to regulated data.
+
+### Microsoft Entra ID is deployed to an on premises environment.
+
+- [ ] Yes.
+- [x] No.
+
+### Microsoft Entra ID is provided as part of a Microsoft 365 subscription.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Entra ID is an identity and access management service.
+
+- [x] Yes.
+- [ ] No.
+
+### Which service should you use to view your Azure secure score?
+
+- [ ] Alerts.
+- [ ] Application Insights.
+- [ ] Policy.
+- [ ] Microsoft Entra Connect Health.
+- [x] Security Center (Microsoft Defender for Cloud).
+- [x] Security Center.
+- [ ] Advisor.
+- [ ] Monitor.
+
+### Which two types of resources can be protected by using Azure Firewall?
+
+- [x] Azure virtual machines.
+- [ ] Microsoft Entra ID users.
+- [ ] Microsoft Exchange Online inboxes.
+- [x] Azure virtual networks.
+- [ ] Microsoft SharePoint Online sites.
+
+### What can you use to provide threat detection for Azure SQL Managed Instance?
+
+- [ ] Microsoft Secure Score.
+- [ ] Application security groups.
+- [x] Microsoft Defender for Cloud.
+- [x] Azure Defender.
+- [ ] Azure Bastion.
+
+### [...] can use conditional access policies to control sessions in real time.
+
+- [ ] Microsoft Entra ID Privileged Identity Management (PIM).
+- [ ] Microsoft Defender for Cloud.
+- [ ] Microsoft Sentinel.
+- [x] Microsoft Defender for Cloud Apps.
+
+### Compliance Manager can be directly accessed from the [...].
+
+- [ ] Microsoft 365 admin center.
+- [ ] Microsoft 365 Defender portal.
+- [x] Microsoft 365 Purview.
+
+### Compliance Manager can be directly accessed from the [...].
+
+- [ ] Microsoft 365 admin center.
+- [ ] Microsoft 365 Defender portal.
+- [x] Microsoft 365 Compliance Center.
+- [ ] Microsoft Support portal.
+
+### In a Core eDiscovery workflow, what should you do before you can search for content?
+
+- [x] Create an eDiscovery hold.
+- [ ] Run Express Analysis.
+- [ ] Configure attorney-client privilege detection.
+- [ ] Export and download results.
+
+### Microsoft Secure Score in the Microsoft 365 security center can provide o recommendations for Microsoft Cloud App Security.
+
+- [x] Yes.
+- [ ] No.
+
+### From the Microsoft 365 security center, you can view how your Microsoft Secure Score compares to the score of organizations like yours.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Secure Score in the Microsoft 365 security center gives you points if you address the improvement action by using a third-party application or software.
+
+- [x] Yes.
+- [ ] No.
+
+### Which Microsoft 365 feature can you use to restrict users from sending email messages that contain lists of customers and their associated credit card numbers?
+
+- [ ] Retention policies.
+- [x] Data loss prevention (DLP) policies.
+- [ ] Conditional access policies.
+- [ ] Information barriers.
+
+### Which Microsoft Entra ID feature can you use to evaluate group membership and automatically remove users that no longer require membership in a group?
+
+- [x] Access reviews.
+- [ ] Managed identities.
+- [ ] Conditional access policies.
+- [ ] Microsoft Entra ID Protection.
+
+### Which Microsoft portal provides information about how Microsoft cloud services comply with regulatory standard, such as International Organization for Standardization (ISO)?
+
+- [ ] Microsoft Endpoint Manager admin center.
+- [ ] Azure Cost Management + Billing.
+- [x] Microsoft Service Trust Portal.
+- [ ] Microsoft Entra ID admin center.
+
+### What can you use to provision Azure resources across multiple subscriptions in a consistent manner?
+
+- [ ] Microsoft Defender for Cloud.
+- [x] Azure Blueprints.
+- [ ] Microsoft Sentinel.
+- [ ] Azure Policy.
+
+### When you enable security defaults in Microsoft Entra ID, [...] will be enabled for all Microsoft Entra ID users.
+
+- [ ] Microsoft Entra ID Protection.
+- [ ] Microsoft Entra Privileged Identity Management (PIM).
+- [x] Multi-factor authentication (MFA).
+
+### [...] provides best practices from Microsoft employees, partners, and customers, including tools and guidance to assist in an Azure deployment.
+
+- [ ] Azure Blueprints.
+- [ ] Azure Policy.
+- [x] The Microsoft Cloud Adoption Framework for Azure.
+- [ ] A resource lock.
+
+### You can manage Microsoft Intune by using the
+
+- [ ] Microsoft Entra ID admin center.
+- [ ] Microsoft 365 Compliance Center.
+- [ ] Microsoft 365 Defender portal.
+- [x] Microsoft Endpoint Manager admin center.
+
+### Verify explicitly is one of the guiding principles of Zero Trust.
+
+- [x] Yes.
+- [ ] No.
+
+### Assume breach is one of the guiding principles of Zero Trust.
+
+- [x] Yes.
+- [ ] No.
+
+### The Zero Trust security model assumes that a firewall secures the internal network from external threats.
+
+- [ ] Yes.
+- [x] No.
+
+### [...] is the process of identifying whether a signed-in user can access a specific resource.
+
+- [ ] Authentication.
+- [x] Authorization.
+- [ ] Federation.
+- [ ] Single sign-on (SSO).
+
+### Which three statements accurately describe the guiding principles of Zero Trust?
+
+- [ ] Define the perimeter by physical locations.
+- [x] Use identity as the primary security boundary.
+- [x] Always verify the permissions of a user explicitly.
+- [x] Always assume that the user system can be breached.
+- [ ] Use the network as the primary security boundary.
+
+### A higher Microsoft Secure Score means a lower identified risk level in the Microsoft 365 tenant.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Secure Score measures progress in completing actions based on controls that include key regulations and standards for data protection and governance.
+
+- [ ] Yes.
+- [x] No.
+
+### In a hybrid identity model, what can you use to sync identities between Active Directory Domain Services (AD DS) and Microsoft Entra ID?
+
+- [ ] Active Directory Federation Services (AD FS).
+- [ ] Microsoft Sentinel.
+- [x] Microsoft Entra Connect.
+- [ ] Microsoft Entra Privileged Identity Management (PIM).
+
+### With Windows Hello for Business, a user's biometric data used for authentication
+
+- [ ] is stored on an external device.
+- [x] is stored on a local device only.
+- [ ] is stored in Microsoft Entra ID.
+- [ ] is replicated to all the devices designated by the user.
+
+### Microsoft Defender for Identity can identify advanced threats from [...] signals.
+
+- [ ] Microsoft Entra ID.
+- [ ] Microsoft Entra Connect.
+- [x] on-premises Active Directory Domain Services (AD DS).
+
+### Which three authentication methods does Windows Hello for Business support?
+
+- [x] Fingerprint.
+- [x] Facial recognition.
+- [x] PIN.
+- [ ] Email verification.
+- [ ] security question.
+
+### You have an Azure subscription. You need to implement approval-based, time-bound role activation. What should you use?
+
+- [ ] Windows Hello for Business.
+- [ ] Microsoft Entra ID Identity Protection.
+- [ ] Access reviews in Microsoft Entra ID.
+- [x] Microsoft Entra ID Privileged Identity Management (PIM).
+
+### Global administrators are exempt from conditional access policies.
+
+- [ ] Yes.
+- [x] No.
+
+### A conditional access policy can add users to Microsoft Entra ID roles.
+
+- [ ] Yes.
+- [x] No.
+
+### Conditional access policies can force the use of multi-factor authentication (MFA) to access cloud apps.
+
+- [x] Yes.
+- [ ] No.
+
+### When security defaults are enabled for an Microsoft Entra ID tenant, which two requirements are enforced?
+
+- [ ] All users must authenticate from a registered device.
+- [x] Administrators must always use Azure Multi-Factor Authentication (MFA).
+- [x] Azure Multi-Factor Authentication (MFA) registration is required for all users.
+- [ ] All users must authenticate by using passwordless sign-in.
+- [ ] All users must authenticate by using Windows Hello.
+
+### Which type of identity is created when you register an application with Microsoft Entra ID?
+
+- [ ] User account.
+- [ ] User-assigned managed identity.
+- [ ] System-assigned managed identity.
+- [x] Service principal.
+
+### Which three tasks can be performed by using Microsoft Entra ID Identity Protection?
+
+- [ ] Configure external access for partner organizations.
+- [x] Export risk detection to third-party utilities.
+- [x] Automate the detection and remediation of identity based-risks.
+- [x] Investigate risks that relate to user authentication.
+- [ ] Create and automatically assign sensitivity labels to data.
+
+### When using multi-factor authentication (MFA), a password is considered something you [...].
+
+- [ ] are.
+- [ ] have.
+- [x] know.
+- [ ] share.
+
+### Windows Hello for Business can use the Microsoft Authenticator app as an authentication method.
+
+- [ ] Yes.
+- [x] No.
+
+### Windows Hello for Business can use a PIN code as an authentication method.
+
+- [x] Yes.
+- [ ] No.
+
+### Windows Hello for Business authentication information syncs across all the devices registered by a user.
+
+- [ ] Yes.
+- [x] No.
+
+### An Azure resource can use a system-assigned [...] to access Azure services.
+
+- [ ] Microsoft Entra ID joined device.
+- [x] managed identity.
+- [ ] service principal.
+- [ ] user identity.
+
+### You can use [...] in the Microsoft 365 security center to view an aggregation of alerts that relate to the same attack.
+
+- [ ] Reports.
+- [ ] Hunting.
+- [ ] Attack simulator.
+- [x] Incidents.
+
+### You can create one Azure Bastion per virtual network.
+
+- [x] Yes.
+- [ ] No.
+
+### Azure Bastion provides secure user connections by using RDP.
+
+- [x] Yes.
+- [ ] No.
+
+### In Microsoft Sentinel, you can automate common tasks by using [...].
+
+- [ ] deep investigation tools.
+- [ ] hunting search-and-query tools.
+- [x] playbooks.
+- [ ] workbooks.
+
+### Which Microsoft Entra ID feature can you use to restrict Microsoft Intune-managed devices from accessing corporate resources?
+
+- [ ] Network security groups (NSGs).
+- [ ] Microsoft Entra Privileged Identity Management (PIM).
+- [x] Conditional access policies.
+- [ ] Resource locks.
+
+### What should you use in the Microsoft 365 Defender portal to view security trends and track the protection status of identities?
+
+- [ ] Attack simulator.
+- [x] Reports.
+- [ ] Hunting.
+- [ ] Incidents.
+
+### You have a Microsoft 365 E3 subscription. You plan to audit user activity by using the unified audit log and Basic Audit. For how long will the audit records be retained?
+
+- [ ] 15 days.
+- [ ] 30 days.
+- [x] 90 days.
+- [ ] 180 days.
+
+### In the Microsoft 365 Defender portal, an incident is a collection of correlated [...].
+
+- [x] alerts.
+- [ ] events.
+- [ ] vulnerabilities.
+- [ ] Microsoft Secure Score improvement actions.
+
+### You need to connect to an Azure virtual machine by using Azure Bastion. What should you use?
+
+- [ ] PowerShell remoting.
+- [x] Azure portal.
+- [ ] Remote Desktop Connection client.
+- [ ] SSH client.
+
+### Which service includes the Attack simulation training feature?
+
+- [ ] Microsoft Defender for Cloud Apps.
+- [ ] Microsoft Defender for Identity.
+- [ ] Microsoft Defender for SQL.
+- [x] Microsoft Defender for Office 365.
+
+### Which type of alert can you manage from the Microsoft 365 Defender portal?
+
+- [ ] Microsoft Defender for Storage.
+- [ ] Microsoft Defender for SQL.
+- [x] Microsoft Defender for Endpoint.
+- [ ] Microsoft Defender for IoT.
+
+### Microsoft Sentinel data connectors support only Microsoft services.
+
+- [ ] Yes.
+- [x] No.
+
+### You can use Azure Monitor workbooks to monitor data collected by Microsoft Sentinel.
+
+- [x] Yes.
+- [ ] No.
+
+### Hunting provides you with the ability to identify security threats before an alert is triggered.
+
+- [x] Yes.
+- [ ] No.
+
+### What is a use case for implementing information barrier policies in Microsoft 365?
+
+- [ ] Restrict unauthenticated access to Microsoft 365.
+- [x] Restrict Microsoft Teams chats between certain groups within an organization.
+- [ ] Restrict Microsoft Exchange Online email between certain groups within an organization.
+- [ ] Restrict data sharing to external email recipients.
+
+### What can you use to deploy Azure resources across multiple subscriptions in a consistent manner?
+
+- [ ] Microsoft Defender for Cloud.
+- [x] Azure Blueprints.
+- [ ] Microsoft Sentinel.
+- [ ] Azure Policy.
+
+### Azure Defender provides security alerts and advanced threat protection for virtual machines, SQL databases, containers, web applications, your network, your storage, and more
+
+- [x] Yes.
+- [ ] No.
+
+### Cloud security posture management (CSPM) is available for free to all Azure users.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Defender for Cloud is a unified infrastructure security management system that strengthens the security posture of your data centers, and provides advanced threat protection across your hybrid workloads in the cloud – whether they’re in Azure or not – as well as on premises.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Entra ID is a cloud-based user identity and authentication service.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft 365 uses Microsoft Entra ID. Microsoft Entra ID is included with your Microsoft 365 subscription.
+
+- [x] Yes.
+- [ ] No.
+
+### Azure Bastion provides a secure connection to an Azure virtual machine by using the Azure portal.
+
+- [x] Yes.
+- [ ] No.
+
+### Azure Information Protection can automatically detect and label sensitive information.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Defender for Cloud Apps can monitor and control cloud app usage through its Cloud Discovery feature.
+
+- [x] Yes.
+- [ ] No.
+
+### Microsoft Purview Data Loss Prevention policies can be applied to Microsoft Teams chat messages.
+
+- [x] Yes.
+- [ ] No.
+
+### Which score measures an organization's progress in completing actions that help reduce risks associated to data protection and regulatory standards?
+
+- [ ] Microsoft Secure Score.
+- [ ] AProductivity Score.
+- [ ] Secure score in Microsoft Defender for Cloud.
+- [x] Compliance score.
+
+### You are evaluating the compliance score in Compliance Manager. Match the compliance score action subcategories to the appropriate actions. [...] Encrypt data at rest.
+
+- [ ] Corrective.
+- [ ] Detective.
+- [x] Preventative.
+
+### You are evaluating the compliance score in Compliance Manager. Match the compliance score action subcategories to the appropriate actions. [...] Perform a system access audit.
+
+- [ ] Corrective.
+- [x] Detective.
+- [ ] Preventative.
+
+### You are evaluating the compliance score in Compliance Manager. Match the compliance score action subcategories to the appropriate actions. [...] Make configuration changes in response to a security incident.
+
+- [x] Corrective.
+- [ ] Detective.
+- [ ] Preventative.
+
+### Conditional access policies can be applied to global administrators.
+
+- [x] Yes.
+- [ ] No.
+
+### Conditional access policies are evaluated before a user is authenticated.
+
+- [ ] Yes.
+- [x] No.
+
+### Conditional access policies can use a device platform, such as Android or iOS, as a signal.
+
+- [x] Yes.
+- [ ] No.
+
+### Which two cards are available in the Microsoft 365 Defender portal?
+
+- [ ] Users at risk.
+- [x] Compliance Score.
+- [x] Devices at risk.
+- [ ] Service Health.
+- [ ] User Management.
+
+### Microsoft 365 Endpoint data loss prevention (Endpoint DLP) can be used on which operating systems?
+
+- [x] Windows 10 and iOS only.
+- [ ] Windows 10 and Android only.
+- [ ] Windows 10, Android, and iOS.
+- [ ] Windows 10 only.
+
+### Which compliance feature should you use to identify documents that are employee resumes?
+
+- [x] Pre-trained classifiers.
+- [ ] Content explorer.
+- [ ] Activity explorer.
+- [ ] eDiscovery.
+
+### What are customers responsible for when evaluating security in a software as a service (SaaS) cloud services model?
+
+- [ ] Applications.
+- [ ] Network controls.
+- [ ] Operating systems.
+- [x] Accounts and identities.
+
+### You need to create a data loss prevention (DLP) policy. What should you use?
+
+- [x] Microsoft 365 admin center.
+- [ ] Microsoft Endpoint Manager admin center.
+- [ ] Microsoft 365 Defender portal.
+- [ ] Microsoft 365 Compliance center.
+
+### What is an assessment in Compliance Manager?
+
+- [ ] Grouping of controls from a specific regulation, standard or policy.
+- [x] Recommended guidance to help organizations align with their corporate standards.
+- [ ] Dictionary of words that are not allowed in company documents.
+- [ ] Policy initiative that includes multiple policies.
+
+### You need to keep a copy of all files in a Microsoft SharePoint site for one year, even if users delete the files from the site. What should you apply to the site?
+
+- [ ] Data loss prevention (DLP) policy.
+- [x] Retention policy.
+- [ ] Insider risk policy.
+- [ ] Sensitivity label policy.
+
+### What can you use to view the Microsoft Secure Score for Devices?
+
+- [ ] Microsoft Defender for Cloud Apps.
+- [x] Microsoft Defender for Endpoint.
+- [ ] Microsoft Defender for Identity.
+- [ ] Microsoft Defender for Office 365.
+
+### Match the Microsoft 365 insider risk management workflow step to the appropriate task. [...] Review and filter alerts.
+
+- [x] Triage.
+- [ ] Investigate.
+- [ ] Action.
+
+### Match the Microsoft 365 insider risk management workflow step to the appropriate task. [...] Create cases in the Case dashboard.
+
+- [ ] Triage.
+- [x] Investigate.
+- [ ] Action.
+
+### Match the Microsoft 365 insider risk management workflow step to the appropriate task. [...] Send a reminder of corporate policies to users.
+
+- [ ] Triage.
+- [ ] Investigate.
+- [x] Action.
+
+### Users can apply sensitivity labels manually.
+
+- [x] Yes.
+- [ ] No.
+
+### Multiple sensitivity labels can be applied to the same file.
+
+- [ ] Yes.
+- [x] No.
+
+### A sensitivity label can apply a watermark to a Microsoft Word document.
+
+- [x] Yes.
+- [ ] No.
+
+### You can use Advanced Audit in Micrdsoft 365 to view billing details.
+
+- [ ] Yes.
+- [x] No.
+
+### You can use Advanced Auditin Microsoft 365 to view the contents of an email message.
+
+- [ ] Yes.
+- [x] No.
+
+### You can use Advanced Auditin Microsoft 365 to view when a user sees the search bar in Outlook on the web to search for message in a mailbox.
+
+- [x] Yes.
+- [ ] No.
+
+### Which identity type in Microsoft Entra ID is specifically assigned to software objects such as applications, service principals, and managed identities to authenticate and access cloud resources?
+
+- [ ] User identity
+- [ ] External identity
+- [x] Workload identity
+- [ ] Device identity
+
+### What type of identity capability in Microsoft Entra ID is designed specifically to identify, govern, and secure autonomous AI agents?
+
+- [ ] Managed identity
+- [ ] Service principal
+- [ ] Workload identity
+- [x] Microsoft Entra Agent ID
+
+### What is a primary benefit of using managed identities for Azure resources compared to traditional service principals with credentials?
+
+- [ ] It enables multi-factor authentication for automated scripts.
+- [x] It eliminates the need for developers to manage credentials in application code.
+- [ ] It provides on-premises Active Directory domain controller access.
+- [ ] It allows external guest users to execute Azure Functions.
+
+### Workload identities in Microsoft Entra ID include applications, service principals, and managed identities.
+
+- [x] Yes.
+- [ ] No.
+
+### Which solution within Microsoft Entra Global Secure Access provides secure, identity-centric access to private corporate applications and resources without relying on a traditional VPN?
+
+- [ ] Microsoft Entra ID Protection
+- [ ] Microsoft Entra Internet Access
+- [x] Microsoft Entra Private Access
+- [ ] Azure Web Application Firewall (WAF)
+
+### Which component of Microsoft Entra Global Secure Access protects user access to Internet, SaaS applications, and Microsoft 365 traffic?
+
+- [ ] Azure Bastion
+- [x] Microsoft Entra Internet Access
+- [ ] Azure Network Security Groups (NSGs)
+- [ ] Microsoft Entra Verified ID
+
+### Which Microsoft Entra feature evaluates identity, device, and risk signals to enforce access policies before granting access through Global Secure Access?
+
+- [ ] Azure ExpressRoute
+- [ ] Microsoft Entra Connect
+- [x] Microsoft Entra Conditional Access
+- [ ] Azure Key Vault
+
+### Which two solutions form the Microsoft Entra Global Secure Access (Security Service Edge) offering?
+
+- [x] Microsoft Entra Internet Access.
+- [ ] Azure Firewall Premium.
+- [x] Microsoft Entra Private Access.
+- [ ] Azure Bastion.
+
+### Which capability within Microsoft Defender for Cloud brings security visibility, posture management, and threat prevention directly into developer source code and CI/CD pipelines?
+
+- [ ] Cloud Workload Protection Platform (CWPP)
+- [ ] Cloud Security Posture Management (CSPM)
+- [x] DevOps Security Management
+- [ ] Microsoft Defender for Endpoint
+
+### What are the three core pillars of Microsoft Defender for Cloud for cloud-native application protection (CNAPP)?
+
+- [ ] SIEM, SOAR, and XDR
+- [x] Cloud Security Posture Management (CSPM), Cloud Workload Protection (CWPP), and DevOps Security Management
+- [ ] DDoS Protection, Firewall, and Bastion
+- [ ] DLP, eDiscovery, and Audit
+
+### DevOps Security Management in Microsoft Defender for Cloud can connect with GitHub and Azure DevOps environments.
+
+- [x] Yes.
+- [ ] No.
+
+### Which feature in Microsoft Defender for Cloud evaluates cloud resource configurations to identify misconfigurations and generate security recommendations?
+
+- [ ] Cloud Workload Protection Platform (CWPP)
+- [x] Cloud Security Posture Management (CSPM)
+- [ ] Microsoft Defender Threat Intelligence
+- [ ] Microsoft Sentinel Playbooks
+
+### Which solution provides a unified view of an organization's overall exposure, attack surface, and critical assets across endpoints, identities, and cloud resources?
+
+- [ ] Microsoft Defender for Cloud Apps
+- [ ] Microsoft Purview Compliance Manager
+- [x] Microsoft Security Exposure Management
+- [ ] Azure Key Vault
+
+### In Microsoft Security Exposure Management, what visual feature models how chains of weaknesses, misconfigurations, and permissions could be exploited by an attacker to reach critical assets?
+
+- [ ] Security Baselines
+- [x] Attack paths
+- [ ] KQL Hunting queries
+- [ ] Sensitivity Label Policies
+
+### What is the key difference between Microsoft Defender XDR and Microsoft Security Exposure Management?
+
+- [ ] Defender XDR manages privacy, while Exposure Management manages licenses.
+- [x] Defender XDR focuses on incident detection and response, while Exposure Management focuses on proactive attack surface and exposure visualization.
+- [ ] Defender XDR is for on-premises only, while Exposure Management is for SaaS only.
+- [ ] There is no difference; they are the exact same product name.
+
+### Microsoft Security Exposure Management aggregates risk data across endpoints, identities, cloud workloads, and external attack surfaces.
+
+- [x] Yes.
+- [ ] No.
+
+### What is the key distinction between Data Security Posture Management (DSPM) and Cloud Security Posture Management (CSPM)?
+
+- [ ] DSPM is part of Entra ID, while CSPM is part of Azure Sentinel.
+- [x] DSPM focuses on evaluating sensitive data risks and protection gaps, while CSPM focuses on cloud infrastructure and resource configurations.
+- [ ] DSPM requires on-premises hardware, while CSPM is purely SaaS.
+- [ ] DSPM is used for billing audits, while CSPM is used for user passwords.
+
+### Which Microsoft Purview capability uses real-time risk signals from Insider Risk Management to dynamically adjust data protection controls such as Data Loss Prevention (DLP) policies?
+
+- [ ] Content Explorer
+- [x] Adaptive Protection
+- [ ] eDiscovery Premium
+- [ ] Customer Lockbox
+
+### What is the primary function of the Microsoft Purview Data Map?
+
+- [ ] To block network traffic to non-compliant cloud apps.
+- [x] To capture and organize metadata about enterprise data assets across cloud and on-premises sources.
+- [ ] To store encryption keys for Azure Virtual Machines.
+- [ ] To generate billing reports for Microsoft 365 subscriptions.
+
+### Which experience in Microsoft Purview provides a central portal for business users and data stewards to discover, understand, and responsibly use governed data assets and data products?
+
+- [ ] Service Trust Portal
+- [x] Unified Catalog
+- [ ] Azure Bastion
+- [ ] Security Copilot Portal
+
+### Adaptive Protection in Microsoft Purview can automatically adjust Data Loss Prevention (DLP) controls based on a user's insider risk level.
+
+- [x] Yes.
+- [ ] No.
+
+### What is Microsoft Security Copilot?
+
+- [ ] A traditional antivirus agent installed on Windows 11 endpoints.
+- [x] A generative-AI security assistant that provides contextual insights, summarizes incidents, and assists analysts across Microsoft security solutions.
+- [ ] A physical hardware firewall appliance deployed in Azure datacenters.
+- [ ] An automated billing calculator for Azure cloud resources.
+
+### How can Microsoft Security Copilot assist security analysts working in Microsoft Sentinel or Microsoft Defender XDR during threat hunting?
+
+- [ ] By physically resetting the router on-premises.
+- [x] By generating KQL (Kusto Query Language) hunting queries from natural language prompts.
+- [ ] By automatically purchasing additional Azure subscriptions.
+- [ ] By replacing the need for identity authentication.
+
+### Microsoft Security Copilot is integrated across multiple Microsoft security experiences, including Entra, Defender XDR, Sentinel, and Purview.
+
+- [x] Yes.
+- [ ] No.
+
+### Which capability in Microsoft Security Copilot allows analysts to quickly understand complex security incidents by reading a concise AI-generated narrative?
+
+- [x] Incident Summarization
+- [ ] Password Hash Synchronization
+- [ ] Resource Lock Removal
+- [ ] Data Map Scanning
+
+### What can you specify in Microsoft 365 sensitivity labels?
+
+- [ ] How long files must be preserved.
+- [ ] When to archive an email message.
+- [x] Which watermark to add to files.
+- [ ] Where to store files.`;
+
+function escapeHtml(str){
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+}
+
+function parseQuiz(markdown){
+  const text = markdown.replace(/\r\n?/g,'\n').trim();
+  const sections = text.split(/\n(?=###\s+)/g);
+  const items = [];
+
+  sections.forEach((section, index) => {
+    const lines = section.split('\n').map(x => x.trim()).filter(Boolean);
+    if (!lines.length) return;
+
+    const title = lines[0].match(/^###\s+(.*)$/);
+    if (!title) return;
+
+    const question = title[1].trim();
+    const options = [];
+    const correct = [];
+
+    lines.slice(1).forEach(line => {
+      const m = line.match(/^\-\s*\[(x| )\]\s+(.*)$/i);
+      if (m) {
+        const option = m[2].trim();
+        options.push(option);
+        if (m[1].toLowerCase() === 'x') correct.push(option);
+      }
+    });
+
+    if (question && options.length) {
+      items.push({
+        id: `q_${index + 1}`,
+        question,
+        options,
+        correct,
+        multi: correct.length > 1
+      });
+    }
+  });
+
+  return items;
+}
+
+const questionBank = parseQuiz(RAW_SOURCE);
+const questionById = new Map(questionBank.map(q => [q.id, q]));
+let sessionQuestions = [];
+let sessionStarted = false;
+let sessionSubmitted = false;
+let currentMode = 'exam';
+let setupMode = 'exam';
+let selectedQuestionCount = 40;
+let sessionUsesRandomOrder = true;
+
+const quizEl = document.getElementById('quiz');
+const answeredValueEl = document.getElementById('answeredValue');
+const scoreValueEl = document.getElementById('scoreValue');
+const scoreStatusEl = document.getElementById('scoreStatus');
+const progressBarEl = document.getElementById('progressBar');
+const compactModeLabelEl = document.getElementById('compactModeLabel');
+const controlsToggleBtnEl = document.getElementById('controlsToggleBtn');
+const controlsDrawerEl = document.getElementById('controlsDrawer');
+const controlbarEl = document.querySelector('.controlbar');
+const summaryBoxEl = document.getElementById('summaryBox');
+const resultPanelEl = document.getElementById('resultPanel');
+const resultPercentEl = document.getElementById('resultPercent');
+const resultFractionEl = document.getElementById('resultFraction');
+const resultBreakdownEl = document.getElementById('resultBreakdown');
+const reviewIncorrectResultBtnEl = document.getElementById('reviewIncorrectResultBtn');
+const newSessionResultBtnEl = document.getElementById('newSessionResultBtn');
+const searchInputEl = document.getElementById('searchInput');
+const submitBtnEl = document.getElementById('submitBtn');
+const resetBtnEl = document.getElementById('resetBtn');
+const showOnlyWrongBtnEl = document.getElementById('showOnlyWrongBtn');
+const showAllBtnEl = document.getElementById('showAllBtn');
+const themeToggleBtnEl = document.getElementById('themeToggleBtn');
+const sessionSetupEl = document.getElementById('sessionSetup');
+const sessionContentEl = document.getElementById('sessionContent');
+const sessionDescriptionEl = document.getElementById('sessionDescription');
+const modeHelpEl = document.getElementById('modeHelp');
+const customCountInputEl = document.getElementById('customCountInput');
+const shuffleSessionInputEl = document.getElementById('shuffleSessionInput');
+const startSessionBtnEl = document.getElementById('startSessionBtn');
+const cancelSetupBtnEl = document.getElementById('cancelSetupBtn');
+const newSessionBtnEl = document.getElementById('newSessionBtn');
+const shuffleOrderBtnEl = document.getElementById('shuffleOrderBtn');
+const newSelectionBtnEl = document.getElementById('newSelectionBtn');
+const allQuestionsChoiceEl = document.getElementById('allQuestionsChoice');
+const previewModeEl = document.getElementById('previewMode');
+const previewCountEl = document.getElementById('previewCount');
+const previewDurationEl = document.getElementById('previewDuration');
+
+// Theme management
+function initTheme(){
+  const saved = localStorage.getItem('theme-mode');
+  const isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (!isDark) document.documentElement.classList.add('light-mode');
+  updateThemeButton();
+}
+
+function updateThemeButton(){
+  const isDark = !document.documentElement.classList.contains('light-mode');
+  themeToggleBtnEl.textContent = isDark ? '☀️' : '🌙';
+  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+  themeToggleBtnEl.title = label;
+  themeToggleBtnEl.setAttribute('aria-label', label);
+}
+
+function toggleTheme(){
+  const html = document.documentElement;
+  html.classList.toggle('light-mode');
+  const isDark = !html.classList.contains('light-mode');
+  localStorage.setItem('theme-mode', isDark ? 'dark' : 'light');
+  updateThemeButton();
+}
+
+// Session preferences
+function initSessionPreferences(){
+  const savedMode = localStorage.getItem('quiz-mode');
+  setupMode = savedMode === 'study' ? 'study' : 'exam';
+
+  const savedCount = localStorage.getItem('quiz-question-count') || '40';
+  selectedQuestionCount = savedCount === 'all' ? 'all' : normalizeCount(savedCount);
+
+  const savedShuffle = localStorage.getItem('quiz-random-order');
+  shuffleSessionInputEl.checked = savedShuffle !== 'false';
+  customCountInputEl.max = String(questionBank.length);
+  const allCountLabel = allQuestionsChoiceEl.querySelector('span');
+  if (allCountLabel) allCountLabel.textContent = 'All (' + questionBank.length + ')';
+
+  updateModeChoices();
+  updateCountChoices();
+}
+
+function updateModeChoices(){
+  document.querySelectorAll('.mode-choice').forEach(button => {
+    button.classList.toggle('active', button.dataset.mode === setupMode);
+  });
+  modeHelpEl.textContent = setupMode === 'study'
+    ? 'Each question is graded as soon as the required answers are selected.'
+    : 'Answers are graded when you submit the complete session.';
+  updateSetupPreview();
+}
+
+function normalizeCount(value){
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) return 40;
+  return Math.max(1, Math.min(parsed, questionBank.length));
+}
+
+function updateCountChoices(){
+  const selectedValue = String(selectedQuestionCount);
+  let matchedPreset = false;
+
+  document.querySelectorAll('.count-choice').forEach(button => {
+    const active = button.dataset.count === selectedValue;
+    button.classList.toggle('active', active);
+    if (active) matchedPreset = true;
+  });
+
+  customCountInputEl.value = matchedPreset || selectedQuestionCount === 'all'
+    ? ''
+    : String(selectedQuestionCount);
+  updateSetupPreview();
+}
+
+function updateSetupPreview(){
+  if (!previewModeEl) return;
+  const count = customCountInputEl.value !== ''
+    ? normalizeCount(customCountInputEl.value)
+    : (selectedQuestionCount === 'all' ? questionBank.length : normalizeCount(selectedQuestionCount));
+  const studyMultiplier = setupMode === 'study' ? 1.15 : 0.75;
+  const minimumMinutes = Math.max(5, Math.round(count * studyMultiplier));
+  const maximumMinutes = Math.max(minimumMinutes + 5, Math.round(count * (studyMultiplier + .35)));
+
+  previewModeEl.textContent = setupMode === 'study' ? 'Study mode' : 'Exam mode';
+  previewCountEl.textContent = count + (count === 1 ? ' question' : ' questions');
+  previewDurationEl.textContent = 'About ' + minimumMinutes + '–' + maximumMinutes + ' minutes';
+}
+
+function gradeQuestionById(qid){
+  const q = questionById.get(qid);
+  if (!q) return;
+  const chosen = getSelectedValues(qid);
+  if (!chosen.length){
+    setFeedback(qid, 'warn', `No answer selected.<br><strong>Correct answer${q.correct.length>1?'s':''}:</strong> ${q.correct.map(escapeHtml).join(', ')}`);
+    return;
+  }
+  if (sameSet(chosen, q.correct)){
+    setFeedback(qid, 'ok', 'Correct');
+  } else {
+    setFeedback(qid, 'bad', `<strong>Incorrect.</strong><br><strong>Your answer${chosen.length>1?'s':''}:</strong> ${chosen.map(escapeHtml).join(', ')}<br><strong>Correct answer${q.correct.length>1?'s':''}:</strong> ${q.correct.map(escapeHtml).join(', ')}`);
+  }
+}
+
+function clearQuestionFeedback(qid){
+  const feedback = document.getElementById(`fb_${qid}`);
+  if (feedback) {
+    feedback.className = 'feedback';
+    feedback.innerHTML = '';
+  }
+  const card = quizEl.querySelector(`[data-question-id="${qid}"]`);
+  if (card) card.classList.remove('is-correct','is-incorrect','is-unanswered');
+  quizEl.querySelectorAll(`[data-qid="${qid}"]`).forEach(input => {
+    const option = input.closest('.option');
+    if (option) option.classList.remove('is-correct-answer','is-wrong-answer');
+  });
+}
+
+// Delegate change listener: provide immediate feedback in study mode
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  if (!t || !t.dataset) return;
+  const qid = t.dataset.qid;
+  if (!qid) return;
+
+  if (sessionSubmitted) {
+    sessionSubmitted = false;
+    clearFeedback();
+    scoreValueEl.textContent = '—';
+    scoreStatusEl.classList.add('hidden');
+    hideResultPanel();
+    summaryBoxEl.textContent = 'Answers changed. Submit again to calculate a new score.';
+  }
+
+  updateAnsweredProgress();
+  if (currentMode !== 'study') return;
+
+  const q = questionById.get(qid);
+  if (!q) return;
+  const chosen = getSelectedValues(qid);
+  if (q.multi) {
+    // Only grade when the user has selected exactly the required number of options
+    if (chosen.length === q.correct.length) {
+      gradeQuestionById(qid);
+    } else {
+      clearQuestionFeedback(qid);
+    }
+  } else {
+    // single-answer: grade immediately
+    gradeQuestionById(qid);
+  }
+});
+
+// Shuffle function
+function shuffleArray(arr){
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function renderQuiz(){
+  quizEl.innerHTML = sessionQuestions.map((q, idx) => {
+    const type = q.multi ? 'checkbox' : 'radio';
+    const helper = q.multi ? `Select ${q.correct.length} answers` : 'Select 1 answer';
+
+    const optionsHtml = q.options.map(opt => `
+      <label class="option">
+        <input type="${type}" name="${q.id}" value="${escapeHtml(opt)}" data-qid="${q.id}">
+        <span>${escapeHtml(opt)}</span>
+      </label>
+    `).join('');
+
+    return `
+      <article class="question" data-question-id="${q.id}" data-qtext="${escapeHtml(q.question.toLowerCase())}">
+        <h3>${idx + 1}. ${escapeHtml(q.question)}</h3>
+        <div class="kind">${helper}</div>
+        <div class="options">${optionsHtml}</div>
+        <div class="feedback" id="fb_${q.id}"></div>
+      </article>
+    `;
+  }).join('');
+
+}
+
+function getRequestedCount(){
+  if (customCountInputEl.value !== '') return normalizeCount(customCountInputEl.value);
+  return selectedQuestionCount === 'all'
+    ? questionBank.length
+    : normalizeCount(selectedQuestionCount);
+}
+
+function buildQuestionSet(count, randomize){
+  const source = randomize ? shuffleArray(questionBank) : [...questionBank];
+  return source.slice(0, Math.min(count, questionBank.length));
+}
+
+function preferredScrollBehavior(){
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+}
+
+function setSessionControlsVisible(visible){
+  document.querySelectorAll('.session-control').forEach(button => {
+    button.classList.toggle('hidden', !visible);
+  });
+  if (!visible) setControlsExpanded(false);
+}
+
+function setControlsExpanded(expanded){
+  controlsToggleBtnEl.setAttribute('aria-expanded', String(expanded));
+  controlsToggleBtnEl.title = expanded ? 'Hide extra controls' : 'Show more controls';
+  controlsDrawerEl.hidden = !expanded;
+  controlbarEl.classList.toggle('is-expanded', expanded);
+}
+
+function updateSessionStats(){
+  updateAnsweredProgress();
+}
+
+function updateSessionDescription(){
+  const modeLabel = currentMode === 'study' ? 'Study mode' : 'Exam mode';
+  const orderLabel = sessionUsesRandomOrder ? 'Random order' : 'Original order';
+  compactModeLabelEl.textContent = currentMode === 'study' ? 'Study' : 'Exam';
+  sessionDescriptionEl.textContent = modeLabel + ' · ' + sessionQuestions.length + ' of ' + questionBank.length + ' questions · ' + orderLabel;
+}
+
+function hideResultPanel(){
+  resultPanelEl.classList.add('hidden');
+  summaryBoxEl.classList.remove('hidden');
+}
+
+function showResultPanel(score, total, pct, unanswered, wrong){
+  resultPercentEl.textContent = pct + '%';
+  resultFractionEl.textContent = score + '/' + total + ' correct';
+  resultBreakdownEl.textContent = score + ' correct · ' + (wrong - unanswered) + ' incorrect · ' + unanswered + ' unanswered';
+  reviewIncorrectResultBtnEl.classList.toggle('hidden', wrong === 0);
+  summaryBoxEl.classList.add('hidden');
+  resultPanelEl.classList.remove('hidden');
+}
+
+function clearSessionResults(){
+  sessionSubmitted = false;
+  scoreValueEl.textContent = '—';
+  scoreStatusEl.classList.add('hidden');
+  progressBarEl.style.width = '0%';
+  answeredValueEl.textContent = '0/' + sessionQuestions.length + ' answered';
+  hideResultPanel();
+  clearFeedback();
+  searchInputEl.value = '';
+}
+
+function startSession(){
+  const count = getRequestedCount();
+  currentMode = setupMode;
+  sessionUsesRandomOrder = shuffleSessionInputEl.checked;
+  sessionQuestions = buildQuestionSet(count, sessionUsesRandomOrder);
+  sessionStarted = true;
+
+  localStorage.setItem('quiz-mode', currentMode);
+  localStorage.setItem('quiz-question-count', selectedQuestionCount === 'all' ? 'all' : String(count));
+  localStorage.setItem('quiz-random-order', String(sessionUsesRandomOrder));
+
+  renderQuiz();
+  clearSessionResults();
+  updateSessionStats();
+  updateSessionDescription();
+
+  sessionSetupEl.classList.add('hidden');
+  sessionContentEl.classList.remove('hidden');
+  setSessionControlsVisible(true);
+  setControlsExpanded(false);
+  summaryBoxEl.textContent = 'Session ready: ' + sessionQuestions.length + ' questions in ' + currentMode + ' mode.';
+  window.scrollTo({ top: 0, behavior: preferredScrollBehavior() });
+}
+
+function showSessionSetup(){
+  if (sessionStarted) {
+    setupMode = currentMode;
+    selectedQuestionCount = sessionQuestions.length === questionBank.length ? 'all' : sessionQuestions.length;
+    updateModeChoices();
+    updateCountChoices();
+  }
+
+  sessionSetupEl.classList.remove('hidden');
+  sessionContentEl.classList.add('hidden');
+  resultPanelEl.classList.add('hidden');
+  summaryBoxEl.classList.remove('hidden');
+  cancelSetupBtnEl.classList.toggle('hidden', !sessionStarted);
+  setSessionControlsVisible(false);
+  summaryBoxEl.textContent = sessionStarted
+    ? 'Configure a new session or return to the current one.'
+    : 'Choose your settings and start a practice session.';
+}
+
+function returnToCurrentSession(){
+  if (!sessionStarted) return;
+  sessionSetupEl.classList.add('hidden');
+  sessionContentEl.classList.remove('hidden');
+  setSessionControlsVisible(true);
+  setControlsExpanded(false);
+  if (sessionSubmitted) {
+    resultPanelEl.classList.remove('hidden');
+    summaryBoxEl.classList.add('hidden');
+  } else {
+    resultPanelEl.classList.add('hidden');
+    summaryBoxEl.classList.remove('hidden');
+    summaryBoxEl.textContent = 'Current session restored.';
+  }
+}
+
+function hasAnyAnswers(){
+  return Boolean(quizEl.querySelector('input:checked'));
+}
+
+function confirmSessionReplacement(message){
+  return !hasAnyAnswers() || window.confirm(message);
+}
+
+function newRandomSelection(){
+  if (!confirmSessionReplacement('Create a new selection and discard the current answers?')) return;
+
+  sessionUsesRandomOrder = true;
+  sessionQuestions = buildQuestionSet(sessionQuestions.length, true);
+  renderQuiz();
+  clearSessionResults();
+  updateSessionStats();
+  updateSessionDescription();
+  summaryBoxEl.textContent = 'A new random selection of ' + sessionQuestions.length + ' questions is ready.';
+  setControlsExpanded(false);
+}
+
+function captureAnswers(){
+  const answers = new Map();
+  sessionQuestions.forEach(q => answers.set(q.id, getSelectedValues(q.id)));
+  return answers;
+}
+
+function restoreAnswers(answers){
+  answers.forEach((values, qid) => {
+    values.forEach(value => {
+      const inputs = document.querySelectorAll('[data-qid="' + qid + '"]');
+      inputs.forEach(input => {
+        if (input.value === value) input.checked = true;
+      });
+    });
+  });
+}
+
+function reapplyStudyFeedback(){
+  if (currentMode !== 'study') return;
+  sessionQuestions.forEach(q => {
+    const chosen = getSelectedValues(q.id);
+    if (!chosen.length) return;
+    if (!q.multi || chosen.length === q.correct.length) gradeQuestionById(q.id);
+  });
+}
+
+function shuffleCurrentOrder(){
+  const answers = captureAnswers();
+  const wasSubmitted = sessionSubmitted;
+  sessionQuestions = shuffleArray(sessionQuestions);
+  sessionUsesRandomOrder = true;
+  renderQuiz();
+  restoreAnswers(answers);
+  updateSessionDescription();
+  updateAnsweredProgress();
+
+  if (wasSubmitted) {
+    submitQuiz(false);
+  } else {
+    reapplyStudyFeedback();
+    summaryBoxEl.textContent = 'Question order shuffled. Your answers were preserved.';
+  }
+  setControlsExpanded(false);
+}
+
+function updateAnsweredProgress(){
+  const answered = sessionQuestions.filter(q => getSelectedValues(q.id).length > 0).length;
+  const total = sessionQuestions.length;
+  const pct = total ? Math.round((answered / total) * 100) : 0;
+  answeredValueEl.textContent = answered + '/' + total + ' answered';
+  progressBarEl.style.width = pct + '%';
+}
+
+function getSelectedValues(questionId){
+  return Array.from(document.querySelectorAll(`[data-qid="${questionId}"]:checked`)).map(x => x.value);
+}
+
+function sameSet(a,b){
+  if (a.length !== b.length) return false;
+  const aa = [...a].sort();
+  const bb = [...b].sort();
+  return aa.every((v,i) => v === bb[i]);
+}
+
+function setFeedback(questionId, cls, html){
+  const el = document.getElementById(`fb_${questionId}`);
+  el.className = `feedback ${cls}`;
+  el.innerHTML = html;
+
+  const card = quizEl.querySelector(`[data-question-id="${questionId}"]`);
+  if (card) {
+    card.classList.remove('is-correct','is-incorrect','is-unanswered');
+    card.classList.add(cls === 'ok' ? 'is-correct' : (cls === 'warn' ? 'is-unanswered' : 'is-incorrect'));
+  }
+
+  const question = questionById.get(questionId);
+  if (!question) return;
+  const chosen = new Set(getSelectedValues(questionId));
+  quizEl.querySelectorAll(`[data-qid="${questionId}"]`).forEach(input => {
+    const option = input.closest('.option');
+    if (!option) return;
+    option.classList.remove('is-correct-answer','is-wrong-answer');
+    if (question.correct.includes(input.value)) option.classList.add('is-correct-answer');
+    if (chosen.has(input.value) && !question.correct.includes(input.value)) option.classList.add('is-wrong-answer');
+  });
+}
+
+function clearFeedback(){
+  quizEl.querySelectorAll('.feedback').forEach(el => {
+    el.className = 'feedback';
+    el.innerHTML = '';
+  });
+  quizEl.querySelectorAll('.question').forEach(card => card.classList.remove('is-correct','is-incorrect','is-unanswered'));
+  quizEl.querySelectorAll('.option').forEach(option => option.classList.remove('is-correct-answer','is-wrong-answer'));
+}
+
+function submitQuiz(scrollToTop = true){
+  let score = 0;
+  let wrong = 0;
+  let unanswered = 0;
+
+  sessionQuestions.forEach(q => {
+    const chosen = getSelectedValues(q.id);
+
+    if (!chosen.length) {
+      unanswered += 1;
+      wrong += 1;
+      setFeedback(
+        q.id,
+        'warn',
+        `No answer selected.<br><strong>Correct answer${q.correct.length > 1 ? 's' : ''}:</strong> ${q.correct.map(escapeHtml).join(', ')}`
+      );
+      return;
+    }
+
+    if (sameSet(chosen, q.correct)) {
+      score += 1;
+      setFeedback(q.id, 'ok', 'Correct');
+    } else {
+      wrong += 1;
+      setFeedback(
+        q.id,
+        'bad',
+        `<strong>Incorrect.</strong><br>
+         <strong>Your answer${chosen.length > 1 ? 's' : ''}:</strong> ${chosen.map(escapeHtml).join(', ')}<br>
+         <strong>Correct answer${q.correct.length > 1 ? 's' : ''}:</strong> ${q.correct.map(escapeHtml).join(', ')}`
+      );
+    }
+  });
+
+  const pct = sessionQuestions.length
+    ? Math.round((score / sessionQuestions.length) * 100)
+    : 0;
+  sessionSubmitted = true;
+  scoreValueEl.textContent = `${pct}%`;
+  scoreStatusEl.classList.remove('hidden');
+  updateAnsweredProgress();
+  summaryBoxEl.innerHTML = `<strong>Result:</strong> ${score}/${sessionQuestions.length} correct (${pct}%). ${unanswered ? `Unanswered: ${unanswered}. ` : ''}${wrong ? `Incorrect or unanswered: ${wrong}.` : 'Perfect score.'}`;
+  showResultPanel(score, sessionQuestions.length, pct, unanswered, wrong);
+  if (scrollToTop) window.scrollTo({ top: 0, behavior: preferredScrollBehavior() });
+}
+
+function resetQuiz(){
+  quizEl.querySelectorAll('input[type="radio"],input[type="checkbox"]').forEach(el => el.checked = false);
+  sessionSubmitted = false;
+  clearFeedback();
+  scoreValueEl.textContent = '—';
+  scoreStatusEl.classList.add('hidden');
+  hideResultPanel();
+  progressBarEl.style.width = '0%';
+  answeredValueEl.textContent = '0/' + sessionQuestions.length + ' answered';
+  summaryBoxEl.textContent = 'Answers reset.';
+  showAll();
+  setControlsExpanded(false);
+}
+
+function filterQuestions(){
+  const query = searchInputEl.value.trim().toLowerCase();
+  document.querySelectorAll('.question').forEach(card => {
+    const text = card.getAttribute('data-qtext') || '';
+    card.classList.toggle('hidden', !!query && !text.includes(query));
+  });
+}
+
+function showOnlyWrong(){
+  document.querySelectorAll('.question').forEach(card => {
+    const qid = card.getAttribute('data-question-id');
+    const fb = document.getElementById(`fb_${qid}`);
+    const keep = fb.classList.contains('bad') || fb.classList.contains('warn');
+    card.classList.toggle('hidden', !keep);
+  });
+}
+
+function showAll(){
+  document.querySelectorAll('.question').forEach(card => card.classList.remove('hidden'));
+  filterQuestions();
+}
+
+document.querySelectorAll('.mode-choice').forEach(button => {
+  button.addEventListener('click', () => {
+    setupMode = button.dataset.mode === 'study' ? 'study' : 'exam';
+    updateModeChoices();
+  });
+});
+
+document.querySelectorAll('.count-choice').forEach(button => {
+  button.addEventListener('click', () => {
+    selectedQuestionCount = button.dataset.count === 'all'
+      ? 'all'
+      : normalizeCount(button.dataset.count);
+    customCountInputEl.value = '';
+    updateCountChoices();
+  });
+});
+
+customCountInputEl.addEventListener('input', () => {
+  if (customCountInputEl.value === '') {
+    updateSetupPreview();
+    return;
+  }
+  selectedQuestionCount = normalizeCount(customCountInputEl.value);
+  document.querySelectorAll('.count-choice').forEach(button => button.classList.remove('active'));
+  updateSetupPreview();
+});
+
+customCountInputEl.addEventListener('change', () => {
+  if (customCountInputEl.value === '') return;
+  const normalized = normalizeCount(customCountInputEl.value);
+  selectedQuestionCount = normalized;
+  customCountInputEl.value = String(normalized);
+  updateSetupPreview();
+});
+
+startSessionBtnEl.addEventListener('click', startSession);
+cancelSetupBtnEl.addEventListener('click', returnToCurrentSession);
+newSessionBtnEl.addEventListener('click', showSessionSetup);
+shuffleOrderBtnEl.addEventListener('click', shuffleCurrentOrder);
+newSelectionBtnEl.addEventListener('click', newRandomSelection);
+submitBtnEl.addEventListener('click', () => submitQuiz(true));
+resetBtnEl.addEventListener('click', resetQuiz);
+searchInputEl.addEventListener('input', filterQuestions);
+showOnlyWrongBtnEl.addEventListener('click', showOnlyWrong);
+showAllBtnEl.addEventListener('click', showAll);
+reviewIncorrectResultBtnEl.addEventListener('click', () => {
+  showOnlyWrong();
+  sessionContentEl.scrollIntoView({ behavior: preferredScrollBehavior(), block: 'start' });
+});
+newSessionResultBtnEl.addEventListener('click', showSessionSetup);
+themeToggleBtnEl.addEventListener('click', toggleTheme);
+controlsToggleBtnEl.addEventListener('click', () => {
+  const expanded = controlsToggleBtnEl.getAttribute('aria-expanded') === 'true';
+  setControlsExpanded(!expanded);
+});
+
+controlsDrawerEl.addEventListener('click', event => {
+  if (event.target.closest('button')) setControlsExpanded(false);
+});
+
+document.addEventListener('click', event => {
+  const expanded = controlsToggleBtnEl.getAttribute('aria-expanded') === 'true';
+  if (expanded && !controlbarEl.contains(event.target)) setControlsExpanded(false);
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') setControlsExpanded(false);
+});
+
+initTheme();
+initSessionPreferences();
+answeredValueEl.textContent = '0/0 answered';
+showSessionSetup();
+</script>
+</body>
+</html>
